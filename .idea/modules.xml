@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/AutodyneFileGenerator.iml" filepath="$PROJECT_DIR$/AutodyneFileGenerator.iml" />
-      <module fileurl="file://$PROJECT_DIR$/master/master.iml" filepath="$PROJECT_DIR$/master/master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AutodyneFileGenerator1.iml" filepath="$PROJECT_DIR$/AutodyneFileGenerator1.iml" />
     </modules>
   </component>
 </project>

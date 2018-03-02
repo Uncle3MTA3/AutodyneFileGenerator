@@ -1,31 +1,9 @@
+package com.autodyne;
+
 import java.io.*;
-//import java.util.*;
 
 
 public class GenerateErrors {
-
-/*	private Map<String, String> indices = new HashMap<>();
-	{
-		indices.put("1A","1");
-		indices.put("1B","2");
-		indices.put("1C","3");
-		indices.put("1D","4");
-		indices.put("2A","5");
-		indices.put("2B","6");
-		indices.put("2C","7");
-		indices.put("2D","8");
-	}
-	private Map<String, String> sensorMap = new HashMap<>();
-	{
-		sensorMap.put("1A","20");
-		sensorMap.put("1B","21");
-		sensorMap.put("1C","22");
-		sensorMap.put("1D","23");
-		sensorMap.put("2A","30");
-		sensorMap.put("2B","31");
-		sensorMap.put("2C","32");
-		sensorMap.put("2D","33");
-	}*/
 
 	public void createFile(Tool tool, String rootDir) {
 		String moduleName = tool.getModuleName();

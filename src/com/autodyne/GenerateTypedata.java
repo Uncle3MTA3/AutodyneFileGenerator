@@ -1,5 +1,6 @@
+package com.autodyne;
+
 import java.io.BufferedWriter;
-//import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -55,8 +56,6 @@ public class GenerateTypedata {
 					entryNumber = 1;
 				}
 				BufferedWriter writer = new BufferedWriter(new FileWriter(filePath + "\\" + tool.getMachine() + "_PCapp_Typedata.dat", true));
-				//PrintWriter writer = machineWriter.get(tool.getMachine());
-				//PrintWriter writer = new PrintWriter(new FileOutputStream(new File(filePath + "\\" + tool.getMachine() + "_PCapp_Typedata.dat"), true));
 				writer.append("$").append(String.valueOf(entryNumber)).append("\n");
 
 				writer.append("[").append(String.valueOf(entryNumber)).append(",False,");

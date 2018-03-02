@@ -1,14 +1,16 @@
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
+package com.autodyne;
 
-import javax.swing.JList;
-import javax.swing.SwingWorker;
+import org.apache.pdfbox.multipdf.Splitter;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 
-import org.apache.pdfbox.multipdf.*;
-import org.apache.pdfbox.pdmodel.*;
-//import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
-import org.apache.pdfbox.text.*;
+import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /*This is the meat of the program
  * This class reads in the pdf file and extracts the important data
@@ -117,8 +119,6 @@ public class PDFParser extends SwingWorker<Integer, String>{
     }
     
     private void processAir(String page) {
-    	//textStr[i+2].substring(0,6).replace(".", "") + "_" + product + "_" + "STN" + textStr[i+2].substring(21,22) + "_" + frame + "_T_ROB1"
-    	//machineNAme + product + stn# + T_ROB1
     	Pattern p = Pattern.compile("\\d{5}-\\d{2}");
     	Matcher m = p.matcher(page);
     	String layout;
@@ -210,7 +210,6 @@ public class PDFParser extends SwingWorker<Integer, String>{
     			}
 				for (Tool tool : tools) {
 					if (tool.getSerial().equals(layout)) {
-//    					System.out.println(valveName);
 						tool.addValves(valveName.toString());
 					}
 				}
@@ -219,7 +218,6 @@ public class PDFParser extends SwingWorker<Integer, String>{
     	pValve = Pattern.compile("(\\d+\\.\r\n)|(\\d+\r\n\\.)");
     	mValve = pValve.matcher(page.substring(first + second + lines));
     	String temp = page.substring(first + second + lines);
-    	//System.out.println(page.substring(first + second + lines));
     	if(mValve.find()) {
     		second = mValve.start();
     		if(second > 0) {
@@ -233,7 +231,6 @@ public class PDFParser extends SwingWorker<Integer, String>{
     			}
 				for (Tool tool : tools) {
 					if (tool.getSerial().equals(layout)) {
-//    					System.out.println(valveName);
 						tool.addValves(valveName.toString());
 					}
 				}

@@ -1,10 +1,11 @@
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.EventQueue;
-import java.awt.event.*; 
+package com.autodyne;
+
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.io.*;   
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
 
 
 

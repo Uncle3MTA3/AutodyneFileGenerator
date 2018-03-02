@@ -1,3 +1,5 @@
+package com.autodyne;
+
 import java.util.*;
 import java.util.regex.*;
 
@@ -20,10 +22,8 @@ public class Tool {
 		this.partTypes = new ArrayList<>();
 		this.allSensors = new ArrayList<>();
 		this.partSensors = new ArrayList<>();
-		//this.valves = new String[20];
 		this.valves = new String[]{"1. Spare","2. Spare","3. Spare","4. Spare","5. Spare","6. Spare","7. Spare","8. Spare","9. Spare","10. Spare",
 				"1. Spare","2. Spare","3. Spare","4. Spare","5. Spare","6. Spare","7. Spare","8. Spare","9. Spare","10. Spare"};
-		//Arrays.fill(this.valves, "Spare");
 		this.clampingSequence = new ArrayList<>();
 		this.unclampingSequence = new ArrayList<>();
 	}
@@ -136,7 +136,6 @@ public class Tool {
 	}
 	
 	public void addValves(String valve) {
-//		System.out.println(valve);
 		Pattern p = Pattern.compile("\\d+\\.");
 		Matcher m = p.matcher(valve);
 		m.find();
@@ -154,7 +153,6 @@ public class Tool {
 			if(singleValve.contains("10.")) {
 				valveNumber = 10;
 			}
-//			System.out.println(valveNumber + " : " + singleValve + " loop");
 			if(singleValve.contains("Adv.") || singleValve.contains("Check")) {
 				this.valves[valveNumber - 1] = singleValve.replace("Adv.","Advance").replace("Ret.","Return").replace("Festo-Cyl.", "").replace("Festo Cyl.", "").replace("Destaco Cyl.","");
 			} else {
@@ -170,7 +168,6 @@ public class Tool {
 		if(singleValve.contains("10.")) {
 			valveNumber = 10;
 		}
-//		System.out.println(valveNumber + " : " + singleValve);
 		if(singleValve.contains("Adv.") || singleValve.contains("Check")) {
 			this.valves[valveNumber - 1] = singleValve.replace("Adv.","Advance").replace("Festo-Cyl.", "").replace("Destaco Cyl.","");
 		} else {
@@ -190,7 +187,6 @@ public class Tool {
 				this.clampingSequence.add("Step " + aC);
 			}
 		}
-		//setNumNests((c.length - 1)/2);
 	}
 	
 	public String[] getClamping() {
