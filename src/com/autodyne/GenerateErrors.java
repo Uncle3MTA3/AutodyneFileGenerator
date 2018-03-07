@@ -36,14 +36,26 @@ public class GenerateErrors {
 		w.println("Clamping Sequence");
 		w.println("3:");
 		w.println("Unclamping Sequence");
-		for(int i = 0; i < tool.getPartSensors().length; i++) {
-			w.println((4 + i) + ":");
-			w.println(tool.getPartSensors()[i].substring(5));
-		}
-		for(int i = 4 + tool.getPartSensors().length; i < 16; i++) {
-			w.println((i) + ":");
-			w.println("not used");
-		}
+		System.out.println("Creating error contents");
+//		if(tool.getPartSensors().equals("-1")) {
+//			System.out.println("No sensors found in schematic");
+//			for (int i = 4; i < 16; i++) {
+//				w.println((i) + ":");
+//				w.println("not used");
+//			}
+//		} else {
+			for (int i = 0; i < tool.getPartSensors().length; i++) {
+				if(tool.getPartSensors()[0].equals("-1")) {
+					break;
+				}
+				w.println((4 + i) + ":");
+				w.println(tool.getPartSensors()[i].substring(5));
+			}
+			for (int i = 4 + tool.getPartSensors().length; i < 16; i++) {
+				w.println((i) + ":");
+				w.println("not used");
+			}
+//		}
 		w.println("16:");
 		w.println("Valve 1 WP - " + tool.getValves()[0].substring(3));
 		w.println("17:");

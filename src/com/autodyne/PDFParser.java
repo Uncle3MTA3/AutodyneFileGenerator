@@ -32,10 +32,10 @@ public class PDFParser extends SwingWorker<Integer, String>{
 	private JList<String> status;
 	private String parts[] = new String[100];
 	
-	public PDFParser(String filePath) {
-		this.path = new File(filePath);
-		this.tools = new ArrayList<>();
-	}
+//	public PDFParser(String filePath) {
+//		this.path = new File(filePath);
+//		this.tools = new ArrayList<>();
+//	}
 	
 	PDFParser(String filePath, String imagePath, boolean clamping, boolean errors, boolean sensors, boolean partType, boolean excelSum, JList<String> jlist) {
 		this.path = new File(filePath);

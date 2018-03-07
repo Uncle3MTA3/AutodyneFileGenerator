@@ -76,9 +76,15 @@ public class GenerateSensorMap {
 	    int y = 320;
 	    Pattern p = Pattern.compile("\\d+");
 	    for(int k = 0; k < tool.getSensors().length; k++) {
+			if(tool.getPartSensors()[0].equals("-1")) {
+				break;
+			}
 			Matcher m = p.matcher(tool.getSensors()[k]);
 			m.find();
 			String sensor = tool.getSensors()[k].substring(m.start(),m.end());
+			if(tool.getSensors()[k].substring(m.start(),m.end()).equals("8")) {
+			    continue;
+            }
 			if(sensor.length()==1) {
 				w.println("<Sensor Width=\"82\" Parent=\"uiPanel2\" AddInformation=\"\" cylinderBMK=\"\" SensorName=\"di" + indices.get(tool.getPosition()) + "B" + sensorMap.get(tool.getPosition()) + tool.getSensors()[k].substring(m.start(),m.end()) + "\" sensorBMK=\"Sxx" + tool.getSensors()[k].substring(m.start(),m.end()) + "\" Height=\"20\" Y=\"" + (y + (k * 20)%80) + "\" X=\"" + (x + (100 * k/4)) + "\" TextPosition=\"MiddleLeft\" />");
 			} else {

@@ -37,16 +37,16 @@ public class Tool {
 		return moduleName;
 	}
 	
-	public void setProduct(String product) {
-		this.product = product;
-	}
+//	public void setProduct(String product) {
+//		this.product = product;
+//	}
 	
 	private String getProduct() {
 		return this.product;
 	}
 	
 	public String getPathModule() {
-		return getMachine().replace(".","") + "_" + getProduct() + "_STN" + getPosition().substring(0,1) + "_T_ROB1";
+		return getMachine().replace(".","") + "_" + getProduct() + "_STN" + getPosition().substring(0,1) + "_ " + this.getFrameGroup() + "_T_ROB1";
 	}
 	
 	public String getSerial() {
@@ -128,6 +128,9 @@ public class Tool {
 	}
 	
 	public String[] getPartSensors() {
+		if(partSensors.size() == 0) {
+			return new String[]{"-1"};
+		}
 		String[] sensors = new String[partSensors.size()];
 		for(int i = 0; i< partSensors.size(); i++) {
 			sensors[i] = partSensors.get(i);

@@ -237,7 +237,7 @@ public class GenerateClamping {
         w.println("			!*** Special function end ***");
         w.println();
         w.println("			!Call the clamping sequence for a Red Herring Test");
-        w.println("			IF bSQ_RedHerringTest_" + tool.getPosition().substring(0,1) + "AC AND (DOutput(doAutoOn)=high) THEN");
+        w.println("			IF bSQ_RedHerringTest_" + tool.getPosition().substring(0,1) + tool.getFrameGroup() + " AND (DOutput(doAutoOn)=high) THEN");
         w.println("				proc" + this.moduleName + "_RedHerring bRedHerringOK;");
         w.println("				IF bRedHerringOK bSQ_RedHerringTest_" + tool.getPosition().substring(0,1) + tool.getFrameGroup() + ":=FALSE;");
         w.println("				GOTO jumpClampEnd;");
@@ -497,9 +497,24 @@ public class GenerateClamping {
 		w.println("		! All sensors are prepared for fixture empty?");
 		if(tool.getNumNests() > 1) {
 			w.println("		IF bOpenN2 and (bOpenN1=false) THEN");
+			if(tool.getPartSensors()[0].equals("-1")) {
+				System.out.println("PartSensors empty");
+				w.println();
+				w.println("	ERROR");
+				w.println("		RETURN;");
+				w.println("	ENDPROC");
+				return;
+			}
 			Pattern p = Pattern.compile("\\d+");
 			Matcher m = p.matcher(tool.getPartSensors()[0]);
-			m.find();
+			boolean result = m.find();
+			if(!result) {
+				w.println();
+				w.println("	ERROR");
+				w.println("		RETURN;");
+				w.println("	ENDPROC");
+				return;
+			}
 			String sensor = tool.getPartSensors()[0].substring(m.start(),m.end());
 			w.print("			outResult:=(di" + indices.get(tool.getPosition()) + "B" + sensor + "=low)");
 			for(int k = 1; k < tool.getPartSensors().length; k++) {
@@ -629,7 +644,7 @@ public class GenerateClamping {
 			w.println("		VAR bool bResult_N" + (i + 1) + ";");
 		}
 		for(int i = 0; i < tool.getNumNests(); i++) {
-			w.println("		bResult_N" + (i + 1) + ":=InOutResult_N" + (tool.getNumNests() - i) + ";");
+			w.println("		bResult_N" + (i + 1) + ":=InOutResult_N" + (i + 1) + ";");
 		}
 		for(int i = 0; i < tool.getNumNests(); i++) {
 			w.println("		InOutResult_N" + (i + 1) + ":=FALSE;");
@@ -638,6 +653,14 @@ public class GenerateClamping {
 		for(int j = 0; j < tool.getNumNests(); j++) {
 			w.println("		IF bResult_N" + (tool.getNumNests() - j) + " THEN");
 			for(int k = 1; k < tool.getSensors().length; k++) {
+				if(tool.getPartSensors()[0].equals("-1")) {
+					System.out.println("PartSensors empty");
+					w.println();
+					w.println("	ERROR");
+					w.println("		RETURN;");
+					w.println("	ENDPROC");
+					return;
+				}
 				Pattern p = Pattern.compile("\\d+");
 				Matcher m = p.matcher(tool.getSensors()[k]);
 				m.find();
@@ -656,7 +679,7 @@ public class GenerateClamping {
 		w.println();
 		w.println("		! All sensors are prepared for part in?");
 		for(int i = 0; i < tool.getNumNests(); i++) {
-			w.println("		InOutResult_N" + (tool.getNumNests() - i) + ":=bResult_N" + (tool.getNumNests() - i) + " AND (bSQ_Frame" + tool.getPosition().substring(0,1) + "ClampingNOK_" + tool.getFrameGroup() + "_N" + (tool.getNumNests() - i) + "=FALSE) AND (nState_" + tool.getFrameGroup() + tool.getPosition().substring(0,1) + "_N{" + (tool.getNumNests() - i) + "}<>51);");
+			w.println("		InOutResult_N" + (i + 1) + ":=bResult_N" + (i + 1) + " AND (bSQ_Frame" + tool.getPosition().substring(0,1) + "ClampingNOK_" + tool.getFrameGroup() + "_N" + (i + 1) + "=FALSE) AND (nState_" + tool.getFrameGroup() + tool.getPosition().substring(0,1) + "_N{" + (i + 1) + "}<>51);");
 		}
 		w.println("	ERROR");
 		w.println("		RETURN;");
@@ -677,6 +700,14 @@ public class GenerateClamping {
 		w.println("		INOUT bool outResult)");
 		w.println();
 		w.println("!! Select the sensors required for PTO");
+		if(tool.getPartSensors()[0].equals("-1")) {
+			System.out.println("PartSensors empty");
+			w.println();
+			w.println("	ERROR");
+			w.println("		RETURN;");
+			w.println("	ENDPROC");
+			return;
+		}
 		Pattern p = Pattern.compile("\\d+");
 		Matcher m = p.matcher(tool.getPartSensors()[0]);
 		m.find();
@@ -806,14 +837,22 @@ public class GenerateClamping {
 		for(int i = 0; i < tool.getPartTypes().length; i++) {
 			w.println("		IF b" + tool.getPartTypes()[i] + " THEN");
 			for(int j = 0; j < tool.getNumNests(); j++) {
+				if(tool.getPartSensors()[0].equals("-1")) {
+					System.out.println("PartSensors empty");
+					w.println();
+					w.println("	ERROR");
+					w.println("		RETURN;");
+					w.println("	ENDPROC");
+					return;
+				}
 				Pattern p = Pattern.compile("\\d+");
 				Matcher m = p.matcher(tool.getPartSensors()[0]);
 				m.find();
 				String sensor = tool.getPartSensors()[0].substring(m.start(),m.end());
 				if(sensor.length()==1) {
-					w.print("			bPartIn_N" + (tool.getNumNests() - j) + "_" + tool.getFrameGroup() + tool.getPosition().substring(0,1) + ":=(di" + sensorMap.get(tool.getPosition()) + indices.get(tool.getPosition()) + "B" + sensor + "=high)");
+					w.print("		bPartIn_N" + (tool.getNumNests() - j) + "_" + tool.getFrameGroup() + tool.getPosition().substring(0,1) + ":=(di" + sensorMap.get(tool.getPosition()) + indices.get(tool.getPosition()) + "B" + sensor + "=high)");
 				} else {
-					w.print("			bPartIn_N" + (tool.getNumNests() - j) + "_" + tool.getFrameGroup() + tool.getPosition().substring(0,1) + ":=(di" + indices.get(tool.getPosition()) + "B" + sensor + "=high)");
+					w.print("		bPartIn_N" + (tool.getNumNests() - j) + "_" + tool.getFrameGroup() + tool.getPosition().substring(0,1) + ":=(di" + indices.get(tool.getPosition()) + "B" + sensor + "=high)");
 				}
 				for(int k = 1; k < tool.getPartSensors().length; k++) {
 					m = p.matcher(tool.getPartSensors()[k]);

@@ -115,7 +115,7 @@ public class GenerateTypedata {
 
 }
 
-class udtTypeData_Base {
+/*class udtTypeData_Base {
 	int typeNo;							//3
 	boolean disabled = false;			//False
 	String identNo;						//"C78633"
@@ -126,8 +126,8 @@ class udtTypeData_Base {
 	int place;							//0
 	int subStation;						//2
 	int setCycleTime_Type;				//12
-}
-class udtTypeData_User {
+}*/
+/*class udtTypeData_User {
 	int loadpos;						//-210
 	int workPos;						//-210
 	boolean laserOri = true;			//True
@@ -164,4 +164,4 @@ class udtTypeData_User {
 	int setValue_Analog_min_2 = 0;		//2.5
 	int setValue_Analog_min_3 = 0;		//0.3
 	int setValue_Analog_min_4 = 0;		//0
-}
+}*/
