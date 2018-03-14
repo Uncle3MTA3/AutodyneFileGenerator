@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
  */
 
 public class PDFParser extends SwingWorker<Integer, String>{
+//public class PDFParser implements Runnable{
 
 	private final String NEW_LINE = System.getProperty("line.separator");
 	
@@ -30,6 +31,7 @@ public class PDFParser extends SwingWorker<Integer, String>{
 	private boolean makePartType;
 	private boolean makeExcel;
 	private JList<String> status;
+	private final JProgressBar bar;
 	private String parts[] = new String[100];
 	
 //	public PDFParser(String filePath) {
@@ -37,7 +39,7 @@ public class PDFParser extends SwingWorker<Integer, String>{
 //		this.tools = new ArrayList<>();
 //	}
 	
-	PDFParser(String filePath, String imagePath, boolean clamping, boolean errors, boolean sensors, boolean partType, boolean excelSum, JList<String> jlist) {
+	PDFParser(String filePath, String imagePath, boolean clamping, boolean errors, boolean sensors, boolean partType, boolean excelSum, JList<String> jlist, JProgressBar pb) {
 		this.path = new File(filePath);
 		this.imagePath = imagePath;
 		this.tools = new ArrayList<>();
@@ -47,6 +49,7 @@ public class PDFParser extends SwingWorker<Integer, String>{
 		this.makePartType = partType;
 		this.makeExcel = excelSum;
 		this.status = jlist;
+		this.bar = pb;
 	}
 	
 	protected Integer doInBackground() {
@@ -58,6 +61,14 @@ public class PDFParser extends SwingWorker<Integer, String>{
 		}
 		return 0;
 	}
+
+//	public void run() {
+//        try {
+//            this.parser();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 	
     private void parser() throws IOException {
 		PDDocument doc = null;
@@ -91,43 +102,94 @@ public class PDFParser extends SwingWorker<Integer, String>{
         	document.close();
 			String directory = path.getParent();
         	int index = 0;
+        	int numFiles = 0;
+        	if(this.makeClamping) {
+        		numFiles += tools.size();
+			}
+			if(this.makeSensors) {
+				numFiles += tools.size();
+			}
+			if(this.makeExcel) {
+				numFiles += tools.size();
+			}
+			if(this.makeClamping) {
+				numFiles += 1;
+			}
+			if(this.makePartType) {
+				numFiles += 1;
+			}
+			System.out.println("numFiles : " + numFiles);
+			double progress = 0;
 			for (Tool tool : tools) {
 				System.out.println(tool.getSerial());
 				if (this.makeClamping) {
 					parts[index] = "Generating " + tool.getModuleName() + " clamping module.";
+                    index++;
 					this.status.setListData(parts);
+					this.status.ensureIndexIsVisible(index);
 					new GenerateClamping().createFile(tool, directory);
-					index++;
+                    progress = (1.0*index)/numFiles;
+					System.out.println("Progress : " + progress);
+					bar.setValue((int)(progress * 100));
+					bar.repaint();
+                    //Thread.sleep(500);
 				}
 				if (this.makeSensors) {
 					parts[index] = "Generating " + tool.getModuleName() + " xml file.";
+                    index++;
 					this.status.setListData(parts);
+                    this.status.ensureIndexIsVisible(index);
 					new GenerateSensorMap().createFile(tool, directory, imagePath);
-					index++;
+                    progress = (1.0*index)/numFiles;
+                    bar.setValue((int)(progress * 100));
+                    bar.repaint();
+                    //Thread.sleep(500);
 				}
 				if (this.makeErrors) {
 					parts[index] = "Generating " + tool.getModuleName() + " error file.";
+                    index++;
 					this.status.setListData(parts);
+                    this.status.ensureIndexIsVisible(index);
 					new GenerateErrors().createFile(tool, directory);
-					index++;
+                    progress = (1.0*index)/numFiles;
+                    bar.setValue((int)(progress * 100));
+                    bar.repaint();
+                    //Thread.sleep(500);
 				}
 			}
         	if(this.makeExcel) {
         		parts[index] = "Generating Tool Placement";
+                index++;
         		this.status.setListData(parts);
+                this.status.ensureIndexIsVisible(index);
         		new GeneratePlacement().createFile(tools, directory, path.getName());
+                progress = (1.0*index)/numFiles;
+                bar.setValue((int)(progress * 100));
+                bar.repaint();
+                //Thread.sleep(500);
         	}
         	if(this.makePartType) {
         		parts[index] = "Generating Part Type Database";
+                index++;
         		this.status.setListData(parts);
+                this.status.ensureIndexIsVisible(index);
         		new GenerateTypedata().createFile(tools, directory);
+                progress = (1.0*index)/numFiles;
+                bar.setValue((int)(progress * 100));
+                bar.repaint();
+                //Thread.sleep(500);
         	}
         	parts[index] = "Finished";
+			bar.setValue(100);
+            bar.repaint();
         	this.status.setListData(parts);
+            this.status.ensureIndexIsVisible(index);
         } catch (IOException e) {
         	document.close();
             e.printStackTrace();
-        }
+        } //catch (InterruptedException e) {
+            //e.printStackTrace();
+        //}
     }
     
     private void processAir(String page) {

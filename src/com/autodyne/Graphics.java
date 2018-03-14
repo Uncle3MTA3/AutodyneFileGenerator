@@ -10,7 +10,7 @@ import java.io.File;
 
 
 public class Graphics extends JFrame implements ActionListener{
-	public static final String BUILD_NUMBER = ".*";
+	public static final String BUILD_NUMBER = "4";
 
 	private static final long serialVersionUID = 1L;
 	private JTextField pdfLocTextField,imageLocTextField;
@@ -19,11 +19,14 @@ public class Graphics extends JFrame implements ActionListener{
 	private final JProgressBar pb = new JProgressBar(0, 100);
 	private JCheckBox clampingCB, errorsCB, sensorsCB, typeCB, excelCB;
 	private final JList<String> partList = new JList<>();
+    private JMenuItem about;
+    private JButton startB;
 
-	private Graphics() {
+    private Graphics() {
 		prepareGUI();
-		System.out.println("GUI Prepared");
+		System.out.println("Program Started");
 		System.out.println("Using JDK version " + System.getProperty("java.version"));
+        System.out.println("Using JRE version " + System.getProperty("java.runtime.version"));
 		System.out.println("Build " + BUILD_NUMBER);
 	}
 	
@@ -69,7 +72,10 @@ public class Graphics extends JFrame implements ActionListener{
 	    file.add(exit);
 	    JMenu help = new JMenu("Help");
 	    JMenuItem instructions = new JMenuItem("Instructions");
+        about = new JMenuItem("About");
 	    help.add(instructions);
+        help.add(about);
+        about.addActionListener(this);
 	    mb.add(file);
 	    mb.add(help);
 	    setJMenuBar(mb);
@@ -109,27 +115,10 @@ public class Graphics extends JFrame implements ActionListener{
 	    pb.setStringPainted(true);
 	    add(pb);
 
-		JButton startB = new JButton("Start");
+		startB = new JButton("Start");
 	    startB.setBounds(x -200, y -125,75,25);
-	    startB.addActionListener(e -> EventQueue.invokeLater(() -> {
-		final PDFParser worker = new PDFParser(pdfLocTextField.getText(), imageLocTextField.getText(),
-												clampingCB.isSelected(),
-												errorsCB.isSelected(),
-												sensorsCB.isSelected(),
-												typeCB.isSelected(),
-												excelCB.isSelected(),
-												partList);
-								worker.addPropertyChangeListener(evt -> {
-									if ("progress".equalsIgnoreCase(evt.getPropertyName())) {
-										int curProgress = worker.getProgress();
-										pb.setValue(curProgress);
-									}
-								});
-								worker.addPropertyChangeListener(evt -> {
 
-								});
-								worker.execute();
-	    }));
+        startB.addActionListener(this);
 	    add(startB);
 
 		JButton exitB = new JButton("Exit");
@@ -153,7 +142,12 @@ public class Graphics extends JFrame implements ActionListener{
 		        pdfLocTextField.setText(filepath);
 		   }
 		} else if(e.getSource() == imageLoc){
-			JFileChooser fc = new JFileChooser("C:\\");
+			JFileChooser fc;
+			if(pdfLocTextField.getText().equals("")) {
+				fc = new JFileChooser("C:\\");
+			} else {
+				fc = new JFileChooser((new File(pdfLocTextField.getText())).getPath());
+			}
 			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		    int i = fc.showOpenDialog(this);
 		    if(i == JFileChooser.APPROVE_OPTION){
@@ -161,7 +155,32 @@ public class Graphics extends JFrame implements ActionListener{
 		        String filepath = f.getAbsolutePath();
 		        imageLocTextField.setText(filepath);
 		    }
-		}
+		} else if(e.getSource() == about) {
+            JOptionPane.showMessageDialog(null, "Version: 1.0\nBuild: " + BUILD_NUMBER);
+        } else if(e.getSource() == startB) {
+//            Runnable parser = new PDFParser(pdfLocTextField.getText(), imageLocTextField.getText(),
+//                    clampingCB.isSelected(),
+//                    errorsCB.isSelected(),
+//                    sensorsCB.isSelected(),
+//                    typeCB.isSelected(),
+//                    excelCB.isSelected(),
+//                    partList,
+//                    pb);
+//            Thread t = new Thread(parser);
+//            t.start();
+		final PDFParser worker = new PDFParser(pdfLocTextField.getText(), imageLocTextField.getText(),
+												clampingCB.isSelected(),
+												errorsCB.isSelected(),
+												sensorsCB.isSelected(),
+												typeCB.isSelected(),
+												excelCB.isSelected(),
+												partList,
+                                                pb);
+								worker.addPropertyChangeListener(evt -> {
+
+								});
+								worker.execute();
+        }
 	}
 
 	public static void main(String[] args) {

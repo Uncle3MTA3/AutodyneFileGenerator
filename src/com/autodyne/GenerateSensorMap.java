@@ -1,20 +1,11 @@
 package com.autodyne;
 
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
-import javax.imageio.stream.FileImageOutputStream;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,11 +43,13 @@ public class GenerateSensorMap {
 		this.imagePath = imageDir;
 		this.moduleName = tool.getModuleName();
 		try{
-			File dir = new File(rootDir + "\\Sensor Maps\\" + tool.getPosition().substring(0,1) + tool.getFrameGroup() + "\\");
+			//File dir = new File(rootDir + "\\Sensor Maps\\" + tool.getPosition().substring(0,1) + tool.getFrameGroup() + "\\");
+			File dir = new File(rootDir + "\\Sensor Maps\\");
 			if(! dir.exists()) {
 				dir.mkdirs();
 			}
-			PrintWriter writer = new PrintWriter(rootDir + "\\Sensor Maps\\" + tool.getPosition().substring(0,1) + tool.getFrameGroup() + "\\" + moduleName + ".xml", "UTF-8");
+			//PrintWriter writer = new PrintWriter(rootDir + "\\Sensor Maps\\" + tool.getPosition().substring(0,1) + tool.getFrameGroup() + "\\" + moduleName + ".xml", "UTF-8");
+			PrintWriter writer = new PrintWriter(rootDir + "\\Sensor Maps\\" + moduleName + ".xml", "UTF-8");
 			addInfo(tool, writer);
 			writer.close();
 		} catch (IOException e) {
@@ -119,38 +112,38 @@ public class GenerateSensorMap {
 		return hashImage;
 	}
 	
-	private File resizeImage(String filePath, String modName) throws IOException {
-		Image img;
-		BufferedImage tempJPG;
-		File newFileJPG;
-		img = ImageIO.read(new File(filePath + "\\" + modName));
-		double ratio;
-		ratio = (double) img.getWidth(null)/img.getHeight(null);
-        tempJPG = resizeImage(img, (int) (464 * ratio));
-        newFileJPG = new File(filePath + "\\" + modName);
-        Iterator<ImageWriter> iter = ImageIO.getImageWritersByFormatName("jpeg");
-        ImageWriter writer = iter.next();
-
-        JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
-        jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-        jpegParams.setCompressionQuality(0.6f);
-
-        writer.setOutput(new FileImageOutputStream(newFileJPG));
-
-        writer.write(null, new IIOImage(tempJPG, null, null), jpegParams);
-     	writer.dispose();
-     	return newFileJPG;
-	}
+//	private File resizeImage(String filePath, String modName) throws IOException {
+//		Image img;
+//		BufferedImage tempJPG;
+//		File newFileJPG;
+//		img = ImageIO.read(new File(filePath + "\\" + modName));
+//		double ratio;
+//		ratio = (double) img.getWidth(null)/img.getHeight(null);
+//        tempJPG = resizeImage(img, (int) (464 * ratio));
+//        newFileJPG = new File(filePath + "\\" + modName);
+//        Iterator<ImageWriter> iter = ImageIO.getImageWritersByFormatName("jpeg");
+//        ImageWriter writer = iter.next();
+//
+//        JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
+//        jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+//        jpegParams.setCompressionQuality(0.6f);
+//
+//        writer.setOutput(new FileImageOutputStream(newFileJPG));
+//
+//        writer.write(null, new IIOImage(tempJPG, null, null), jpegParams);
+//     	writer.dispose();
+//     	return newFileJPG;
+//	}
 	
-	private BufferedImage resizeImage(final Image image, int width) {
-        final BufferedImage bufferedImage = new BufferedImage(width, 464, BufferedImage.TYPE_INT_RGB);
-        final Graphics2D graphics2D = bufferedImage.createGraphics();
-        graphics2D.setComposite(AlphaComposite.Src);
-        graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        graphics2D.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
-        graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-        graphics2D.drawImage(image, 0, 0, width, 464, null);
-        graphics2D.dispose();
-        return bufferedImage;
-    }
+//	private BufferedImage resizeImage(final Image image, int width) {
+//        final BufferedImage bufferedImage = new BufferedImage(width, 464, BufferedImage.TYPE_INT_RGB);
+//        final Graphics2D graphics2D = bufferedImage.createGraphics();
+//        graphics2D.setComposite(AlphaComposite.Src);
+//        graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+//        graphics2D.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+//        graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+//        graphics2D.drawImage(image, 0, 0, width, 464, null);
+//        graphics2D.dispose();
+//        return bufferedImage;
+//    }
 }

@@ -1,6 +1,8 @@
 package com.autodyne;
 
 import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.*;
 
@@ -34,11 +36,13 @@ public class GenerateClamping {
 	public void createFile(Tool tool, String rootDir) {
 		this.moduleName = tool.getModuleName();
 		try{
-			File dir = new File(rootDir + "\\Clamping Modules\\" + tool.getPosition().substring(0,1) + tool.getFrameGroup() + "\\");
+			//File dir = new File(rootDir + "\\Clamping Modules\\" + tool.getPosition().substring(0,1) + tool.getFrameGroup() + "\\");
+            File dir = new File(rootDir + "\\Clamping Modules\\");
 			if(! dir.exists()) {
 				dir.mkdirs();
 			}
-			PrintWriter writer = new PrintWriter(rootDir + "\\Clamping Modules\\" + tool.getPosition().substring(0,1) + tool.getFrameGroup() + "\\" + moduleName + ".mod", "UTF-8");
+			//PrintWriter writer = new PrintWriter(rootDir + "\\Clamping Modules\\" + tool.getPosition().substring(0,1) + tool.getFrameGroup() + "\\" + moduleName + ".mod", "UTF-8");
+            PrintWriter writer = new PrintWriter(rootDir + "\\Clamping Modules\\" + moduleName + ".mod", "UTF-8");
 			addHeader(writer);
 			addModuleStart(writer);
 			addChangeLog(writer);
@@ -58,7 +62,7 @@ public class GenerateClamping {
 			addFooter(writer);
 			writer.close();
 		} catch (IOException e) {
-			System.out.println("SCRIPT FAILED DURING MOD GENERATION");
+			System.out.println("SCRIPT FAILED DURING MODULE GENERATION");
 			e.printStackTrace();
 		}
 	}
@@ -101,15 +105,17 @@ public class GenerateClamping {
 		w.println("	!********************************************************");
 		w.println("	!*                     Variablen                        *");
 		w.println("	!********************************************************");
-		if(tool.getNumNests() == 2) {
-			w.println("	LOCAL VAR bool bOpenAll;");
-			w.println("	LOCAL VAR bool bOpenN1;");
-			w.println("	LOCAL VAR bool bOpenN2;");
+		if(tool.getNumNests() > 1) {
+            w.println("	LOCAL VAR bool bOpenAll;");
+		    for(int i = 0; i < tool.getNumNests(); i++) {
+                w.println("	LOCAL VAR bool bOpenN" + (i + 1) + ";");
+            }
 		}
 		w.println("	LOCAL VAR bool bRedHerringOK;");
-		if(tool.getNumNests() == 2) {
-			w.println("	LOCAL VAR bool bClearNest1;");
-			w.println("	LOCAL VAR bool bClearNest2;");
+		if(tool.getNumNests() > 1) {
+            for(int i = 0; i < tool.getNumNests(); i++) {
+                w.println("	LOCAL VAR bool bClearNest" + (i + 1) + ";");
+            }
 		}
 		w.println();
 		w.println("	! Persistent Variables for Types --");
@@ -138,7 +144,8 @@ public class GenerateClamping {
 		w.println("*");
 		w.println("	!*                                                         *");
 		w.println("	!*  Date:          Version:    Programmer:       Reason:   *");
-		w.println("	!*  15.02.2017     1.0         A.Sinclair        created   *");
+		DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+		w.println("	!*  " + dateFormat.format(new Date()) + "     1.0         A.Utodyne        created   *");
 		w.println("	!***********************************************************");
 		w.println("	PROC proc" + this.moduleName + "(");
 		w.println("	bool inFirstRUN,");
@@ -149,7 +156,7 @@ public class GenerateClamping {
 		w.println("		! Variables Types STN" + tool.getPosition().substring(0,1));
 		w.println("		!Frame " + tool.getPosition());
 		for(int i = 0; i < tool.getPartTypes().length; i++) {
-		w.println("		b" + tool.getPartTypes()[i] + ":=(TypeBase_ActualType{" + indices.get(tool.getPosition()) + "}.TypeNo=" + indices.get(tool.getPosition()) + ");");
+		    w.println("		b" + tool.getPartTypes()[i] + ":=(TypeBase_ActualType{" + indices.get(tool.getPosition()) + "}.TypeNo=" + indices.get(tool.getPosition()) + ");");
 		}
 		w.println("		! Configuration of fixture");
 		w.println("		bConfig_PTO_Fixture_" + tool.getPosition() + ":=FALSE;");
@@ -497,6 +504,7 @@ public class GenerateClamping {
 		w.println("		! All sensors are prepared for fixture empty?");
 		if(tool.getNumNests() > 1) {
 			w.println("		IF bOpenN2 and (bOpenN1=false) THEN");
+            w.println("			!nest 2 only!!!");
 			if(tool.getPartSensors()[0].equals("-1")) {
 				System.out.println("PartSensors empty");
 				w.println();
@@ -528,8 +536,8 @@ public class GenerateClamping {
 				}
 			}
 			w.println(";");
-			w.println("			!nest 2 only!!!");
 			w.println("		ELSEIF (bopenN2=false) and bopenN1 THEN");
+            w.println("			! Nest 1 only!");
 			p = Pattern.compile("\\d+");
 			m = p.matcher(tool.getPartSensors()[0]);
 			m.find();
@@ -546,8 +554,8 @@ public class GenerateClamping {
 				}
 			}
 			w.println(";");
-			w.println("			! Nest 1 only!");
 			w.println("		ELSE");
+            w.println("			!both N1 and N2!!");
 			p = Pattern.compile("\\d+");
 			m = p.matcher(tool.getPartSensors()[0]);
 			m.find();
@@ -587,7 +595,6 @@ public class GenerateClamping {
 			w.println("				bClearNest2:=TRUE;");
 			w.println("			ENDIF");
 			w.println("			outResult:=bClearNest1 AND bClearNest2;");
-			w.println("			!both N1 and N2!!");
 			w.println("			IF outResult THEN");
 			w.println("				bClearNest1:=FALSE;");
 			w.println("				bClearNest2:=FALSE;");
@@ -651,7 +658,7 @@ public class GenerateClamping {
 		}
 		w.println();
 		for(int j = 0; j < tool.getNumNests(); j++) {
-			w.println("		IF bResult_N" + (tool.getNumNests() - j) + " THEN");
+			w.println("		IF bResult_N" + (j + 1) + " THEN");
 			for(int k = 1; k < tool.getSensors().length; k++) {
 				if(tool.getPartSensors()[0].equals("-1")) {
 					w.println();
@@ -668,9 +675,9 @@ public class GenerateClamping {
 					continue;
 				}
 				if(sensor.length()==1) {
-					w.println("			WaitGraphDI di" + indices.get(tool.getPosition()) + "B" + sensorMap.get(tool.getPosition()) + sensor + ",log1,log1,log1\\inLogOr:=bSQ_Frame" + tool.getPosition().substring(0,1) + "ClampingNOK_" + tool.getFrameGroup() + "_N" + (tool.getNumNests() - j) + ",GetMUI_Text(" + (3 + k) + "\\inTextTable:=nTextTableGraph)\\inSV_Value:=2.0;");
+					w.println("			WaitGraphDI di" + indices.get(tool.getPosition()) + "B" + sensorMap.get(tool.getPosition()) + sensor + ",log1,log1,log1\\inLogOr:=bSQ_Frame" + tool.getPosition().substring(0,1) + "ClampingNOK_" + tool.getFrameGroup() + "_N" + (j + 1) + ",GetMUI_Text(" + (3 + k) + "\\inTextTable:=nTextTableGraph)\\inSV_Value:=2.0;");
 				} else {
-					w.println("			WaitGraphDI di" + indices.get(tool.getPosition()) + "B" + sensor + ",log1,log1,log1\\inLogOr:=bSQ_Frame" + tool.getPosition().substring(0,1) + "ClampingNOK_" + tool.getFrameGroup() + "_N" + (tool.getNumNests() - j) + ",GetMUI_Text(" + (3 + k) + "\\inTextTable:=nTextTableGraph)\\inSV_Value:=2.0;");
+					w.println("			WaitGraphDI di" + indices.get(tool.getPosition()) + "B" + sensor + ",log1,log1,log1\\inLogOr:=bSQ_Frame" + tool.getPosition().substring(0,1) + "ClampingNOK_" + tool.getFrameGroup() + "_N" + (j + 1) + ",GetMUI_Text(" + (3 + k) + "\\inTextTable:=nTextTableGraph)\\inSV_Value:=2.0;");
 				}
 			}
 			w.println("		ENDIF");
@@ -869,16 +876,16 @@ public class GenerateClamping {
 		}
 		w.println();
 		for(int j = 0; j < tool.getNumNests(); j++) {
-			w.println("		IF bPartIn_N" + (tool.getNumNests() - j) + "_" + tool.getFrameGroup() + tool.getPosition().substring(0,1) + " THEN");
+			w.println("		IF bPartIn_N" + (j + 1) + "_" + tool.getFrameGroup() + tool.getPosition().substring(0,1) + " THEN");
 			for(int k = 1; k < tool.getPartSensors().length; k++) {
 				Pattern p = Pattern.compile("\\d+");
 				Matcher m = p.matcher(tool.getPartSensors()[k]);
 				m.find();
 				String sensor = tool.getPartSensors()[k].substring(m.start(),m.end());
 				if(sensor.length()==1) {
-					w.println("				WaitGraphDI di" + indices.get(tool.getPosition()) + "B" + sensorMap.get(tool.getPosition()) + sensor + ",log1,log1,log1\\inLogOr:=bSQ_Frame" + tool.getPosition().substring(0,1) + "ClampingNOK_" + tool.getFrameGroup() + "_N" + (tool.getNumNests() - j) + ",GetMUI_Text(" + (3 + k) + "\\inTextTable:=nTextTableGraph)\\inSV_Value:=2.0;");
+					w.println("				WaitGraphDI di" + indices.get(tool.getPosition()) + "B" + sensorMap.get(tool.getPosition()) + sensor + ",log1,log1,log1\\inLogOr:=bSQ_Frame" + tool.getPosition().substring(0,1) + "ClampingNOK_" + tool.getFrameGroup() + "_N" + (j + 1) + ",GetMUI_Text(" + (3 + k) + "\\inTextTable:=nTextTableGraph)\\inSV_Value:=2.0;");
 				} else {
-					w.println("				WaitGraphDI di" + indices.get(tool.getPosition()) + "B" + sensor + ",log1,log1,log1\\inLogOr:=bSQ_Frame" + tool.getPosition().substring(0,1) + "ClampingNOK_" + tool.getFrameGroup() + "_N" + (tool.getNumNests() - j) + ",GetMUI_Text(" + (3 + k) + "\\inTextTable:=nTextTableGraph)\\inSV_Value:=2.0;");
+					w.println("				WaitGraphDI di" + indices.get(tool.getPosition()) + "B" + sensor + ",log1,log1,log1\\inLogOr:=bSQ_Frame" + tool.getPosition().substring(0,1) + "ClampingNOK_" + tool.getFrameGroup() + "_N" + (j + 1) + ",GetMUI_Text(" + (3 + k) + "\\inTextTable:=nTextTableGraph)\\inSV_Value:=2.0;");
 				}
 			}
 			w.println("		ENDIF");
