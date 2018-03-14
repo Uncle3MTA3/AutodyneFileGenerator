@@ -60,6 +60,18 @@ public class PDFParser extends SwingWorker<Integer, String>{
 	}
 	
     private void parser() throws IOException {
+		PDDocument doc = null;
+		//doc = PDDocument.load(path);
+		//PDFStreamEngine engine = new PDFStreamEngine(ResourceLoader.loadProperties("org/apache/pdfbox/resources/PageDrawer.properties"));
+		//PDPage page = (PDPage)doc.getDocumentCatalog().getAllPages().get(0);
+		//engine.processStream(page, page.findResources(), page.getContents().getStream());
+		//PDGraphicsState graphicState = engine.getGraphicsState();
+		//System.out.println(graphicState.getStrokingColor().getColorSpace().getName());
+		//float colorSpaceValues[] = graphicState.getStrokingColor().getColorSpaceValue();
+		//for (float c : colorSpaceValues) {
+			//System.out.println(c * 255);
+		//}
+
     	PDDocument document = PDDocument.load(path);
         try {
         	Splitter splitter = new Splitter();

@@ -99,11 +99,11 @@ public class GenerateSensorMap {
 	private String getHash() {
 		String fileName = moduleName.substring(0,moduleName.length() - 3) + ".jpg";
 		File dir = new File(imagePath + "\\" + fileName);
-		try {
-			dir = resizeImage(imagePath, fileName);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			dir = resizeImage(imagePath, fileName);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 		FileInputStream imageInFile;
 		String hashImage = "";
 		try {
@@ -130,11 +130,11 @@ public class GenerateSensorMap {
         newFileJPG = new File(filePath + "\\" + modName);
         Iterator<ImageWriter> iter = ImageIO.getImageWritersByFormatName("jpeg");
         ImageWriter writer = iter.next();
-        
+
         JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
         jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
         jpegParams.setCompressionQuality(0.6f);
-        
+
         writer.setOutput(new FileImageOutputStream(newFileJPG));
 
         writer.write(null, new IIOImage(tempJPG, null, null), jpegParams);

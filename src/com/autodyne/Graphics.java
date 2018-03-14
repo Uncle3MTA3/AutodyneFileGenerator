@@ -10,6 +10,7 @@ import java.io.File;
 
 
 public class Graphics extends JFrame implements ActionListener{
+	public static final String BUILD_NUMBER = ".*";
 
 	private static final long serialVersionUID = 1L;
 	private JTextField pdfLocTextField,imageLocTextField;
@@ -23,13 +24,14 @@ public class Graphics extends JFrame implements ActionListener{
 		prepareGUI();
 		System.out.println("GUI Prepared");
 		System.out.println("Using JDK version " + System.getProperty("java.version"));
+		System.out.println("Build " + BUILD_NUMBER);
 	}
 	
 	private void prepareGUI() {
 		int y = 500;
 		int x = 700;
 		setSize(x, y);
-		setTitle("Autodyne/Brose File Generator");
+		setTitle("Autodyne/Brose File Generator - build " + BUILD_NUMBER);
 		GroupLayout layout = new GroupLayout(this);
     	setLayout(layout);
     	layout.setAutoCreateGaps(true);
@@ -110,24 +112,24 @@ public class Graphics extends JFrame implements ActionListener{
 		JButton startB = new JButton("Start");
 	    startB.setBounds(x -200, y -125,75,25);
 	    startB.addActionListener(e -> EventQueue.invokeLater(() -> {
-final PDFParser worker = new PDFParser(pdfLocTextField.getText(), imageLocTextField.getText(),
-clampingCB.isSelected(),
-errorsCB.isSelected(),
-sensorsCB.isSelected(),
-typeCB.isSelected(),
-excelCB.isSelected(),
-partList);
-worker.addPropertyChangeListener(evt -> {
-if ("progress".equalsIgnoreCase(evt.getPropertyName())) {
-int curProgress = worker.getProgress();
-pb.setValue(curProgress);
-}
-});
-worker.addPropertyChangeListener(evt -> {
+		final PDFParser worker = new PDFParser(pdfLocTextField.getText(), imageLocTextField.getText(),
+												clampingCB.isSelected(),
+												errorsCB.isSelected(),
+												sensorsCB.isSelected(),
+												typeCB.isSelected(),
+												excelCB.isSelected(),
+												partList);
+								worker.addPropertyChangeListener(evt -> {
+									if ("progress".equalsIgnoreCase(evt.getPropertyName())) {
+										int curProgress = worker.getProgress();
+										pb.setValue(curProgress);
+									}
+								});
+								worker.addPropertyChangeListener(evt -> {
 
-});
-worker.execute();
-}));
+								});
+								worker.execute();
+	    }));
 	    add(startB);
 
 		JButton exitB = new JButton("Exit");

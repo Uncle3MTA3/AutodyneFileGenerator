@@ -654,7 +654,6 @@ public class GenerateClamping {
 			w.println("		IF bResult_N" + (tool.getNumNests() - j) + " THEN");
 			for(int k = 1; k < tool.getSensors().length; k++) {
 				if(tool.getPartSensors()[0].equals("-1")) {
-					System.out.println("PartSensors empty");
 					w.println();
 					w.println("	ERROR");
 					w.println("		RETURN;");

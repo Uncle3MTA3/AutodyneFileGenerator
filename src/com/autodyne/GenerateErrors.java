@@ -36,7 +36,6 @@ public class GenerateErrors {
 		w.println("Clamping Sequence");
 		w.println("3:");
 		w.println("Unclamping Sequence");
-		System.out.println("Creating error contents");
 //		if(tool.getPartSensors().equals("-1")) {
 //			System.out.println("No sensors found in schematic");
 //			for (int i = 4; i < 16; i++) {
