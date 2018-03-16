@@ -8,8 +8,8 @@
   <target name="init">
       <buildnumber/>
       <replaceregexp file="${src}/com/autodyne/Graphics.java"
-               match="public\s+static\s+final\s+String\s+BUILD_NUMBER\s+=\s+&quot;.*&quot;;"
-               replace="public static final String BUILD_NUMBER = &quot;${build.number}&quot;;"
+               match="private static final String BUILD_NUMBER = &quot;1.*&quot;;"
+               replace="private static final String BUILD_NUMBER = &quot;1.${build.number}&quot;;"
                byline="true"
       />
   </target>

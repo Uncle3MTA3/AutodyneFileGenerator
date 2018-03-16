@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,8 +18,7 @@ import java.util.regex.Pattern;
  * it then adds the information to a Tool object that is stored in a List
  */
 
-public class PDFParser extends SwingWorker<Integer, String>{
-//public class PDFParser implements Runnable{
+public class SchematicParser extends SwingWorker<Integer, String>{
 
 	private final String NEW_LINE = System.getProperty("line.separator");
 	
@@ -34,12 +34,7 @@ public class PDFParser extends SwingWorker<Integer, String>{
 	private final JProgressBar bar;
 	private String parts[] = new String[100];
 	
-//	public PDFParser(String filePath) {
-//		this.path = new File(filePath);
-//		this.tools = new ArrayList<>();
-//	}
-	
-	PDFParser(String filePath, String imagePath, boolean clamping, boolean errors, boolean sensors, boolean partType, boolean excelSum, JList<String> jlist, JProgressBar pb) {
+	SchematicParser(String filePath, String imagePath, boolean clamping, boolean errors, boolean sensors, boolean partType, boolean excelSum, JList<String> jlist, JProgressBar pb) {
 		this.path = new File(filePath);
 		this.imagePath = imagePath;
 		this.tools = new ArrayList<>();
@@ -61,28 +56,8 @@ public class PDFParser extends SwingWorker<Integer, String>{
 		}
 		return 0;
 	}
-
-//	public void run() {
-//        try {
-//            this.parser();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
 	
     private void parser() throws IOException {
-		PDDocument doc = null;
-		//doc = PDDocument.load(path);
-		//PDFStreamEngine engine = new PDFStreamEngine(ResourceLoader.loadProperties("org/apache/pdfbox/resources/PageDrawer.properties"));
-		//PDPage page = (PDPage)doc.getDocumentCatalog().getAllPages().get(0);
-		//engine.processStream(page, page.findResources(), page.getContents().getStream());
-		//PDGraphicsState graphicState = engine.getGraphicsState();
-		//System.out.println(graphicState.getStrokingColor().getColorSpace().getName());
-		//float colorSpaceValues[] = graphicState.getStrokingColor().getColorSpaceValue();
-		//for (float c : colorSpaceValues) {
-			//System.out.println(c * 255);
-		//}
-
     	PDDocument document = PDDocument.load(path);
         try {
         	Splitter splitter = new Splitter();
@@ -109,19 +84,19 @@ public class PDFParser extends SwingWorker<Integer, String>{
 			if(this.makeSensors) {
 				numFiles += tools.size();
 			}
-			if(this.makeExcel) {
+			if(this.makeErrors) {
 				numFiles += tools.size();
 			}
-			if(this.makeClamping) {
+			if(this.makeExcel) {
 				numFiles += 1;
 			}
 			if(this.makePartType) {
 				numFiles += 1;
 			}
 			System.out.println("numFiles : " + numFiles);
-			double progress = 0;
+			System.out.print("Progress : 0%");
+			double progress;
 			for (Tool tool : tools) {
-				System.out.println(tool.getSerial());
 				if (this.makeClamping) {
 					parts[index] = "Generating " + tool.getModuleName() + " clamping module.";
                     index++;
@@ -129,10 +104,10 @@ public class PDFParser extends SwingWorker<Integer, String>{
 					this.status.ensureIndexIsVisible(index);
 					new GenerateClamping().createFile(tool, directory);
                     progress = (1.0*index)/numFiles;
-					System.out.println("Progress : " + progress);
 					bar.setValue((int)(progress * 100));
+					System.out.print("\rProgress : " + (int)(progress * 100) + "%");
+					Thread.sleep(100);
 					bar.repaint();
-                    //Thread.sleep(500);
 				}
 				if (this.makeSensors) {
 					parts[index] = "Generating " + tool.getModuleName() + " xml file.";
@@ -142,8 +117,9 @@ public class PDFParser extends SwingWorker<Integer, String>{
 					new GenerateSensorMap().createFile(tool, directory, imagePath);
                     progress = (1.0*index)/numFiles;
                     bar.setValue((int)(progress * 100));
+					System.out.print("\rProgress : " + (int)(progress * 100) + "%");
+                    Thread.sleep(100);
                     bar.repaint();
-                    //Thread.sleep(500);
 				}
 				if (this.makeErrors) {
 					parts[index] = "Generating " + tool.getModuleName() + " error file.";
@@ -153,8 +129,9 @@ public class PDFParser extends SwingWorker<Integer, String>{
 					new GenerateErrors().createFile(tool, directory);
                     progress = (1.0*index)/numFiles;
                     bar.setValue((int)(progress * 100));
+					System.out.print("\rProgress : " + (int)(progress * 100) + "%");
+                    Thread.sleep(100);
                     bar.repaint();
-                    //Thread.sleep(500);
 				}
 			}
         	if(this.makeExcel) {
@@ -165,8 +142,9 @@ public class PDFParser extends SwingWorker<Integer, String>{
         		new GeneratePlacement().createFile(tools, directory, path.getName());
                 progress = (1.0*index)/numFiles;
                 bar.setValue((int)(progress * 100));
+				System.out.print("\rProgress : " + (int)(progress * 100) + "%");
+                Thread.sleep(100);
                 bar.repaint();
-                //Thread.sleep(500);
         	}
         	if(this.makePartType) {
         		parts[index] = "Generating Part Type Database";
@@ -176,20 +154,23 @@ public class PDFParser extends SwingWorker<Integer, String>{
         		new GenerateTypedata().createFile(tools, directory);
                 progress = (1.0*index)/numFiles;
                 bar.setValue((int)(progress * 100));
+				System.out.print("\rProgress : " + (int)(progress * 100) + "%");
+                Thread.sleep(100);
                 bar.repaint();
-                //Thread.sleep(500);
         	}
         	parts[index] = "Finished";
 			bar.setValue(100);
+            System.out.println();
             bar.repaint();
         	this.status.setListData(parts);
             this.status.ensureIndexIsVisible(index);
         } catch (IOException e) {
         	document.close();
+        	System.err.println(Arrays.toString(e.getStackTrace()));
             e.printStackTrace();
-        } //catch (InterruptedException e) {
-            //e.printStackTrace();
-        //}
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
     
     private void processAir(String page) {

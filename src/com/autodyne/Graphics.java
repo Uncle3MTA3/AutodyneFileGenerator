@@ -10,7 +10,7 @@ import java.io.File;
 
 
 public class Graphics extends JFrame implements ActionListener{
-	public static final String BUILD_NUMBER = "4";
+	private static final String BUILD_NUMBER = "1.4";
 
 	private static final long serialVersionUID = 1L;
 	private JTextField pdfLocTextField,imageLocTextField;
@@ -23,14 +23,16 @@ public class Graphics extends JFrame implements ActionListener{
     private JButton startB;
 
     private Graphics() {
-		prepareGUI();
-		System.out.println("Program Started");
-		System.out.println("Using JDK version " + System.getProperty("java.version"));
+        System.out.println("Program Started");
+        System.out.println("Using JDK version " + System.getProperty("java.version"));
         System.out.println("Using JRE version " + System.getProperty("java.runtime.version"));
-		System.out.println("Build " + BUILD_NUMBER);
+        System.out.println("Build " + BUILD_NUMBER);
+		prepareGUI();
 	}
 	
 	private void prepareGUI() {
+        ImageIcon img = new ImageIcon("C:\\Data\\_Test\\logo.jpg");
+        this.setIconImage(img.getImage());
 		int y = 500;
 		int x = 700;
 		setSize(x, y);
@@ -158,28 +160,17 @@ public class Graphics extends JFrame implements ActionListener{
 		} else if(e.getSource() == about) {
             JOptionPane.showMessageDialog(null, "Version: 1.0\nBuild: " + BUILD_NUMBER);
         } else if(e.getSource() == startB) {
-//            Runnable parser = new PDFParser(pdfLocTextField.getText(), imageLocTextField.getText(),
-//                    clampingCB.isSelected(),
-//                    errorsCB.isSelected(),
-//                    sensorsCB.isSelected(),
-//                    typeCB.isSelected(),
-//                    excelCB.isSelected(),
-//                    partList,
-//                    pb);
-//            Thread t = new Thread(parser);
-//            t.start();
-		final PDFParser worker = new PDFParser(pdfLocTextField.getText(), imageLocTextField.getText(),
-												clampingCB.isSelected(),
-												errorsCB.isSelected(),
-												sensorsCB.isSelected(),
-												typeCB.isSelected(),
-												excelCB.isSelected(),
-												partList,
-                                                pb);
-								worker.addPropertyChangeListener(evt -> {
-
-								});
-								worker.execute();
+		    final SchematicParser worker = new SchematicParser(pdfLocTextField.getText(),
+                    imageLocTextField.getText(),
+                    clampingCB.isSelected(),
+                    errorsCB.isSelected(),
+                    sensorsCB.isSelected(),
+                    typeCB.isSelected(),
+                    excelCB.isSelected(),
+                    partList,
+                    pb);
+		    //worker.addPropertyChangeListener(evt -> { });
+		    worker.execute();
         }
 	}
 
