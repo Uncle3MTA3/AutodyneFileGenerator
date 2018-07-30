@@ -10,7 +10,7 @@ import java.io.File;
 
 
 public class Graphics extends JFrame implements ActionListener{
-	private static final String BUILD_NUMBER = "1.4";
+	private static final String BUILD_NUMBER = ".102";
 
 	private static final long serialVersionUID = 1L;
 	private JTextField pdfLocTextField,imageLocTextField;
@@ -19,14 +19,14 @@ public class Graphics extends JFrame implements ActionListener{
 	private final JProgressBar pb = new JProgressBar(0, 100);
 	private JCheckBox clampingCB, errorsCB, sensorsCB, typeCB, excelCB;
 	private final JList<String> partList = new JList<>();
-    private JMenuItem about;
-    private JButton startB;
+    private JMenuItem exit, about, instructions;
+    private JButton startB, exitB;
 
     private Graphics() {
         System.out.println("Program Started");
-        System.out.println("Using JDK version " + System.getProperty("java.version"));
+        //System.out.println("Using JDK version " + System.getProperty("java.version"));
         System.out.println("Using JRE version " + System.getProperty("java.runtime.version"));
-        System.out.println("Build " + BUILD_NUMBER);
+        System.out.println("Build " + BUILD_NUMBER.substring(1));
 		prepareGUI();
 	}
 	
@@ -35,16 +35,26 @@ public class Graphics extends JFrame implements ActionListener{
         this.setIconImage(img.getImage());
 		int y = 500;
 		int x = 700;
-		setSize(x, y);
-		setTitle("Autodyne/Brose File Generator - build " + BUILD_NUMBER);
-		GroupLayout layout = new GroupLayout(this);
-    	setLayout(layout);
-    	layout.setAutoCreateGaps(true);
-    	layout.setAutoCreateContainerGaps(true);
-    	setLayout(new BorderLayout());
-    	setLayout(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
+		this.setSize(x, y);
+		this.setTitle("Autodyne/Brose File Generator - build 1.2" + BUILD_NUMBER);
+		//GroupLayout layout = new GroupLayout(this);
+    	//layout.setAutoCreateGaps(true);
+    	//layout.setAutoCreateContainerGaps(true);
+    	this.setLayout(null);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            // handle exception
+        }
+
+        // load PDF schematic
         JLabel pdfLocText = new JLabel("PDF Schematic");
 		pdfLocText.setBounds(25,25,200,25);
 		add(pdfLocText);
@@ -55,8 +65,9 @@ public class Graphics extends JFrame implements ActionListener{
 	    pdfLoc.setBounds(225,50,100,25);
 	    pdfLoc.addActionListener(this);
 	    add(pdfLoc);
-	    
-	    JLabel imageLocText = new JLabel("Part Images Folder");
+
+        // load images folder
+	    JLabel imageLocText = new JLabel("Tool Images Folder");
 	    imageLocText.setBounds(25,75,200,25);
 	    add(imageLocText);
 	    imageLocTextField = new JTextField();
@@ -66,14 +77,15 @@ public class Graphics extends JFrame implements ActionListener{
 	    imageLoc.setBounds(225,100,100,25);
 	    imageLoc.addActionListener(this);
 	    add(imageLoc);
-        
+
+        // set up menu system
 	    JMenuBar mb = new JMenuBar();
 	    JMenu file = new JMenu("File");  
-	    JMenuItem exit = new JMenuItem("Exit");
+	    exit = new JMenuItem("Exit");
 	    exit.addActionListener(e -> System.exit(0));
 	    file.add(exit);
 	    JMenu help = new JMenu("Help");
-	    JMenuItem instructions = new JMenuItem("Instructions");
+	    instructions = new JMenuItem("Instructions");
         about = new JMenuItem("About");
 	    help.add(instructions);
         help.add(about);
@@ -81,7 +93,8 @@ public class Graphics extends JFrame implements ActionListener{
 	    mb.add(file);
 	    mb.add(help);
 	    setJMenuBar(mb);
-	    
+
+	    // set up check boxes
 	    clampingCB = new JCheckBox();
 	    clampingCB.setBounds(x -250,50,250,50);
 	    clampingCB.setText("Generate Clamping");
@@ -107,26 +120,26 @@ public class Graphics extends JFrame implements ActionListener{
 	    add(sensorsCB);
 	    add(typeCB);
 	    add(excelCB);
-	    
+
+	    // set up display window
 	    JScrollPane scrollList = new JScrollPane(partList);
 	    scrollList.setBounds(25,150,400,200);
 	    scrollList.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 	    add(scrollList);
-	    
+
+	    // set up progress bar
 	    pb.setBounds(50, y -125, x -275,25);
 	    pb.setStringPainted(true);
 	    add(pb);
 
+	    // set up buttons
 		startB = new JButton("Start");
 	    startB.setBounds(x -200, y -125,75,25);
-
         startB.addActionListener(this);
 	    add(startB);
-
-		JButton exitB = new JButton("Exit");
+		exitB = new JButton("Exit");
 	    exitB.setBounds(x -125, y -125,75,25);
 	    exitB.addActionListener(this);
-	    exitB.addActionListener(e -> System.exit(0));
 	    add(exitB);
 
 	}
@@ -158,7 +171,7 @@ public class Graphics extends JFrame implements ActionListener{
 		        imageLocTextField.setText(filepath);
 		    }
 		} else if(e.getSource() == about) {
-            JOptionPane.showMessageDialog(null, "Version: 1.0\nBuild: " + BUILD_NUMBER);
+            JOptionPane.showMessageDialog(null, "Version: 1.0\nBuild: " + BUILD_NUMBER.substring(1));
         } else if(e.getSource() == startB) {
 		    final SchematicParser worker = new SchematicParser(pdfLocTextField.getText(),
                     imageLocTextField.getText(),
@@ -171,6 +184,8 @@ public class Graphics extends JFrame implements ActionListener{
                     pb);
 		    //worker.addPropertyChangeListener(evt -> { });
 		    worker.execute();
+        } else if(e.getSource() == exitB) {
+            System.exit(0);
         }
 	}
 

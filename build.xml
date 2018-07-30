@@ -1,4 +1,4 @@
-<project name="AutodyneFileGenerator" default="init" basedir=".">
+<project name="AutodyneFileGeneratorV2" default="init" basedir=".">
     <description>
         simple example increment build variable
     </description>
@@ -8,8 +8,8 @@
   <target name="init">
       <buildnumber/>
       <replaceregexp file="${src}/com/autodyne/Graphics.java"
-               match="private static final String BUILD_NUMBER = &quot;1.*&quot;;"
-               replace="private static final String BUILD_NUMBER = &quot;1.${build.number}&quot;;"
+               match="private static final String BUILD_NUMBER = &quot;.*&quot;;"
+               replace="private static final String BUILD_NUMBER = &quot;.${build.number}&quot;;"
                byline="true"
       />
   </target>
