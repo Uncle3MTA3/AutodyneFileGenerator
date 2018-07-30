@@ -10,7 +10,7 @@ import java.io.File;
 
 
 public class Graphics extends JFrame implements ActionListener{
-	private static final String BUILD_NUMBER = ".102";
+	private static final String BUILD_NUMBER = ".129";
 
 	private static final long serialVersionUID = 1L;
 	private JTextField pdfLocTextField,imageLocTextField;
@@ -37,9 +37,6 @@ public class Graphics extends JFrame implements ActionListener{
 		int x = 700;
 		this.setSize(x, y);
 		this.setTitle("Autodyne/Brose File Generator - build 1.2" + BUILD_NUMBER);
-		//GroupLayout layout = new GroupLayout(this);
-    	//layout.setAutoCreateGaps(true);
-    	//layout.setAutoCreateContainerGaps(true);
     	this.setLayout(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -82,13 +79,14 @@ public class Graphics extends JFrame implements ActionListener{
 	    JMenuBar mb = new JMenuBar();
 	    JMenu file = new JMenu("File");  
 	    exit = new JMenuItem("Exit");
-	    exit.addActionListener(e -> System.exit(0));
+	    exit.addActionListener(this);
 	    file.add(exit);
 	    JMenu help = new JMenu("Help");
 	    instructions = new JMenuItem("Instructions");
         about = new JMenuItem("About");
 	    help.add(instructions);
         help.add(about);
+        instructions.addActionListener(this);
         about.addActionListener(this);
 	    mb.add(file);
 	    mb.add(help);
@@ -141,55 +139,126 @@ public class Graphics extends JFrame implements ActionListener{
 	    exitB.setBounds(x -125, y -125,75,25);
 	    exitB.addActionListener(this);
 	    add(exitB);
-
 	}
 
-	public void actionPerformed(ActionEvent e) {  
-		if(e.getSource() == pdfLoc){
-			JFileChooser fc = new JFileChooser("C:\\");
-			FileNameExtensionFilter pdffilter = new FileNameExtensionFilter(
-				     "pdf files (*.pdf)", "pdf");
-			fc.setFileFilter(pdffilter);
-		    int i = fc.showOpenDialog(this);
-		    if(i == JFileChooser.APPROVE_OPTION){    
-		        File f=fc.getSelectedFile();
-		        String filepath=f.getPath();
-		        pdfLocTextField.setText(filepath);
-		   }
-		} else if(e.getSource() == imageLoc){
-			JFileChooser fc;
-			if(pdfLocTextField.getText().equals("")) {
-				fc = new JFileChooser("C:\\");
-			} else {
-				fc = new JFileChooser((new File(pdfLocTextField.getText())).getPath());
-			}
-			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		    int i = fc.showOpenDialog(this);
-		    if(i == JFileChooser.APPROVE_OPTION){
-		        File f = fc.getSelectedFile();
-		        String filepath = f.getAbsolutePath();
-		        imageLocTextField.setText(filepath);
-		    }
-		} else if(e.getSource() == about) {
-            JOptionPane.showMessageDialog(null, "Version: 1.0\nBuild: " + BUILD_NUMBER.substring(1));
+	private void loadPDFFile() {
+        JFileChooser fc = new JFileChooser("C:\\");
+        FileNameExtensionFilter pdffilter = new FileNameExtensionFilter(
+                "pdf files (*.pdf)", "pdf");
+        fc.setFileFilter(pdffilter);
+        int i = fc.showOpenDialog(this);
+        if(i == JFileChooser.APPROVE_OPTION){
+            File f=fc.getSelectedFile();
+            String filepath=f.getPath();
+            pdfLocTextField.setText(filepath);
+        }
+    }
+
+    private void loadImageDirectory() {
+        JFileChooser fc;
+        if(pdfLocTextField.getText().equals("")) {
+            fc = new JFileChooser("C:\\");
+        } else {
+            fc = new JFileChooser((new File(pdfLocTextField.getText())).getPath());
+        }
+        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int i = fc.showOpenDialog(this);
+        if(i == JFileChooser.APPROVE_OPTION){
+            File f = fc.getSelectedFile();
+            String filepath = f.getAbsolutePath();
+            imageLocTextField.setText(filepath);
+        }
+    }
+
+    private void startProgram() {
+        final SchematicParser worker = new SchematicParser(pdfLocTextField.getText(),
+                imageLocTextField.getText(),
+                clampingCB.isSelected(),
+                errorsCB.isSelected(),
+                sensorsCB.isSelected(),
+                typeCB.isSelected(),
+                excelCB.isSelected(),
+                partList,
+                pb);
+        worker.execute();
+    }
+
+	private void instructionsPopup() {
+        String output =
+                "<html><h2>Modify template file using following schema:</h2>" +
+                  "<table>" +
+                    "<tr>" +
+                      "<th>variable name</th>" +
+                      "<th>details</th>" +
+                    "</tr>" +
+                    "<tr>" +
+                      "<td><b>%clamping_sequence%</b></td>" +
+                      "<td>includes step comments, valve actuation and rough sensors</td>" +
+                    "</tr>" +
+                    "<tr>" +
+                      "<td><b>%unclamping_sequence%</b></td>" +
+                      "<td>includes step comments, valve actuation and rough sensors</td>" +
+                    "</tr>" +
+                    "<tr>" +
+                      "<td><b>%part_sensors%</b></td>" +
+                      "<td>waitdi list of part sensors</td>" +
+                    "</tr>" +
+                    "<tr>" +
+                      "<td><b>%valve_sensors%</b></td>" +
+                      "<td>waitdi list of all sensors</td>" +
+                    "</tr>" +
+                    "<tr>" +
+                      "<td><b>%part_type%</b></td>" +
+                      "<td>i.e. C53462, E04466, etc...</td>" +
+                    "</tr>" +
+                    "<tr>" +
+                      "<td><b>%frame%</b></td>" +
+                      "<td>i.e. 1A, 2B, etc...</td>" +
+                    "</tr>" +
+                    "<tr>" +
+                      "<td><b>%part_name%</b></td>" +
+                      "<td>i.e. DAG LH OB LR, etc...</td>" +
+                    "</tr>" +
+                    "<tr>" +
+                      "<td><b>%side%</b></td>" +
+                      "<td>i.e. 1, 2</td>" +
+                    "</tr>" +
+                    "<tr>" +
+                      "<td><b>%frame_group%</b></td>" +
+                      "<td>i.e. AC, BD, etc...</td>" +
+                    "</tr>" +
+                    "<tr>" +
+                      "<td><b>%part_sensor_andor%</b></td>" +
+                      "<td>sensor=high and/or sensor=high, etc...</td>" +
+                    "</tr>" +
+                  "</table>" +
+                  "<li>Brose for pdf schematic" +
+                  "<li> Optional: brose for tool image directory" +
+                  "<li>Select which files you want to create" +
+                  "<li>Press start" +
+                  "<li>Files will be generated in same location as pdf file" +
+                "</html>";
+        JOptionPane.showMessageDialog(null,output);
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource() == about) {
+            String output = "Version: 1.0\nBuild: " + BUILD_NUMBER.substring(1);
+            JOptionPane.showMessageDialog(null, output);
+        } else if(e.getSource() == pdfLoc){
+            loadPDFFile();
+        } else if(e.getSource() == imageLoc){
+            loadImageDirectory();
+        } else if(e.getSource() == instructions) {
+            instructionsPopup();
         } else if(e.getSource() == startB) {
-		    final SchematicParser worker = new SchematicParser(pdfLocTextField.getText(),
-                    imageLocTextField.getText(),
-                    clampingCB.isSelected(),
-                    errorsCB.isSelected(),
-                    sensorsCB.isSelected(),
-                    typeCB.isSelected(),
-                    excelCB.isSelected(),
-                    partList,
-                    pb);
-		    //worker.addPropertyChangeListener(evt -> { });
-		    worker.execute();
-        } else if(e.getSource() == exitB) {
+            startProgram();
+        } else if(e.getSource() == exit || e.getSource() == exitB) {
             System.exit(0);
         }
-	}
+    }
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 		SwingUtilities.invokeLater(() -> new Graphics().setVisible(true));
 	}
 }

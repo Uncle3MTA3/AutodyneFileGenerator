@@ -4,13 +4,11 @@ import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.regex.*;
 
 
 public class GenerateClamping {
 
-	private String moduleName;
-	private Map<String, String> indices = new HashMap<>();
+    private Map<String, String> indices = new HashMap<>();
 	{
 		indices.put("1A","1");
 		indices.put("1B","2");
@@ -34,9 +32,8 @@ public class GenerateClamping {
 	}
 
 	public void createFile(Tool tool, String rootDir) {
-		this.moduleName = tool.getModuleName();
+        String moduleName = tool.getModuleName();
 		try{
-			//File dir = new File(rootDir + "\\Clamping Modules\\" + tool.getPosition().substring(0,1) + tool.getFrameGroup() + "\\");
             File dir = new File(rootDir + "\\Clamping Modules\\");
 			if(! dir.exists()) {
 				dir.mkdirs();
@@ -52,8 +49,8 @@ public class GenerateClamping {
 
 	private void processModule(PrintWriter w, Tool tool) {
 	    try {
-            String in = "";
-            String out = "";
+            String in;
+            String out;
             Scanner template;
             if (tool.getNumNests() > 1) {
                 template = new Scanner(new File("C:\\Data\\Programs\\Clamping_2nest.mod"));
@@ -62,7 +59,6 @@ public class GenerateClamping {
             }
             while(template.hasNext()) {
                 in = template.nextLine();
-                out = "";
                 /*%clamping_sequence%			includes step comments, valve actuation and rough sensors
 	             %unclamping_sequence%		includes step comments, valve actuation and rough sensors
 	             %part_sensors%				list of waitdi for sensors
@@ -97,23 +93,21 @@ public class GenerateClamping {
                 out = out.replaceAll("%part_type%",tool.getModuleName()
                                 .substring(0,tool.getModuleName().length() - 3));
                 out = out.replaceAll("%frame%",tool.getPosition());
-                String filler = "";
+                StringBuilder filler = new StringBuilder();
                 for(int i = 0; i < 44 - tool.getVariant().length(); i++) {
-                    filler += " ";
+                    filler.append(" ");
                 }
                 out = out.replaceAll("%part_name%",tool.getVariant() + filler + "*");
                 out = out.replaceAll("%side%",tool.getPosition().substring(0,1));
                 out = out.replaceAll("%frame_group%",tool.getFrameGroup());
                 out = out.replaceAll("%part_sensor_andor%",tool.getPartSensorAndOr("OR"));
                 DateFormat dateFormat = new SimpleDateFormat("dd.MM.yy");
-                //Date date = new Date();
-                //System.out.println(dateFormat.format(new Date()));
                 out = out.replaceAll("%date%",dateFormat.format(new Date()));
                 String username = System.getProperty("user.name");
                 String output = username.substring(0, 1).toUpperCase() + username.substring(1);
-                filler = "";
+                filler = new StringBuilder();
                 for(int i = 0; i < 18 - output.length(); i++) {
-                    filler += " ";
+                    filler.append(" ");
                 }
                 out = out.replaceAll("%name%",output + filler + "created   *");
                 w.println(out);

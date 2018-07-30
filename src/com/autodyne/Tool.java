@@ -59,9 +59,9 @@ public class Tool {
 		return moduleName;
 	}
 	
-//	public void setProduct(String product) {
-//		this.product = product;
-//	}
+	public void setProduct(String product) {
+		this.product = product;
+	}
 	
 	private String getProduct() {
 		return this.product;
@@ -262,48 +262,45 @@ public class Tool {
 	}
 
 	public String getClampingSequence() {
-	    String output = "";
+	    StringBuilder output = new StringBuilder();
         for(int i = 0; i < this.getClamping().length; i++) {
-            output += "			!! " + this.getClamping()[i] + "\n";
+            output.append("			!! ").append(this.getClamping()[i]).append("\n");
             Pattern p = Pattern.compile("V\\d+");
             Matcher m = p.matcher(this.getClamping()[i]);
             while(m.find()) {
                 if(this.getClamping()[i].substring(m.start() + 1, m.end()).equals("5")) {
                     continue;
                 }
-                output += "			SetSK " + this.getClamping()[i].substring(m.start() + 1, m.end()) + ",WP;\n";
+                output.append("			SetSK ").append(this.getClamping()[i].substring(m.start() + 1, m.end())).append(",WP;\n");
             }
-            output += "			IF b" + this.getPartTypes()[0] + " AND bPartIn_N" + this.getNumNests() + "_" +
-                    this.getFrameGroup() + this.getPosition().substring(0,1) + " THEN\n";
+            output.append("			IF b").append(this.getPartTypes()[0]).append(" AND bPartIn_N").append(this.getNumNests()).append("_").append(this.getFrameGroup()).append(this.getPosition().substring(0, 1)).append(" THEN\n");
             m = p.matcher(this.getClamping()[i]);
             while(m.find()) {
-                output += "				WaitGraphDI log1,log1,log1,log1\\\\inLogOr:=bSQ_Frame" + this.getPosition()
-                        .substring(0,1) + "ClampingNOK_" + this.getFrameGroup() + "_N" + this.getNumNests() + "," +
-                        "GetMUI_Text(" + (20 + Integer.parseInt(this.getClamping()[i].substring(m.start() +
-                        1, m.end()))) + "\\\\inTextTable:=nTextTableGraph)\\\\inSV_Value:=2.0;\n";
+                output.append("				WaitGraphDI log1,log1,log1,log1\\\\inLogOr:=bSQ_Frame").append(this.getPosition()
+                        .substring(0, 1)).append("ClampingNOK_").append(this.getFrameGroup()).append("_N").append(this.getNumNests()).append(",").append("GetMUI_Text(").append(20 + Integer.parseInt(this.getClamping()[i].substring(m.start() +
+                        1, m.end()))).append("\\\\inTextTable:=nTextTableGraph)\\\\inSV_Value:=2.0;\n");
             }
-            output += "			ENDIF\n";
-            output += "\n";
-            output += "			IF bSQ_Frame" + this.getPosition().substring(0,1) + "ClampingNOK_" +
-                    this.getFrameGroup() + "_N" + this.getNumNests() + " GOTO jumpClampEnd;\n";
-            output += "\n";
+            output.append("			ENDIF\n");
+            output.append("\n");
+            output.append("			IF bSQ_Frame").append(this.getPosition().substring(0, 1)).append("ClampingNOK_").append(this.getFrameGroup()).append("_N").append(this.getNumNests()).append(" GOTO jumpClampEnd;\n");
+            output.append("\n");
         }
-        return output;
+        return output.toString();
     }
 
     public String getUnclampingSequence() {
-	    String output = "";
+	    StringBuilder output = new StringBuilder();
         for(int i = 0; i < this.getUnclamping().length; i++) {
-            output += "			!! " + this.getUnclamping()[i] + "\n";
+            output.append("			!! ").append(this.getUnclamping()[i]).append("\n");
             Pattern p = Pattern.compile("V\\d+");
             Matcher m = p.matcher(this.getUnclamping()[i]);
             while(m.find()) {
                 if(this.getUnclamping()[i].substring(m.start() + 1, m.end()).equals("5")) {
                     continue;
                 }
-                output += "			";
+                output.append("			");
                 if(this.getNumNests() == 2) {
-                    output += "IF bOpenN" + this.getNumNests() + " ";
+                    output.append("IF bOpenN").append(this.getNumNests()).append(" ");
                 }
                 String toggle = "HP";
                 if(this.getUnclamping()[i].contains("returned")) {
@@ -313,29 +310,27 @@ public class Tool {
                 } else if(this.getUnclamping()[i].contains("De-energize")) {
                     toggle = "DL";
                 }
-                output += "SetSK " + this.getUnclamping()[i].substring(m.start() + 1, m.end()) + "," + toggle + ";\n";
+                output.append("SetSK ").append(this.getUnclamping()[i].substring(m.start() + 1, m.end())).append(",").append(toggle).append(";\n");
             }
             m = p.matcher(this.getUnclamping()[i]);
             while(m.find()) {
                 if(this.getUnclamping()[i].substring(m.start() + 1, m.end()).equals("5")) {
                     continue;
                 }
-                output += "			";
+                output.append("			");
                 if(this.getNumNests() == 2) {
-                    output += "IF bOpenN" + this.getNumNests() + " ";
+                    output.append("IF bOpenN").append(this.getNumNests()).append(" ");
                 }
-                output += "WaitGraphDI log1,log1,log1,log1\\\\inLogOr:=bSQ_Frame" + this.getPosition().substring(0,1)
-                        + "ClampingNOK_" + this.getFrameGroup() + "_N" + this.getNumNests() + ",GetMUI_Text(" + (30 +
-                        Integer.parseInt(this.getUnclamping()[i].substring(m.start() + 1, m.end()))) +
-                        "\\\\inTextTable:=nTextTableGraph)\\\\inSV_Value:=2.0;\n";
+                output.append("WaitGraphDI log1,log1,log1,log1\\\\inLogOr:=bSQ_Frame").append(this.getPosition().substring(0, 1)).append("ClampingNOK_").append(this.getFrameGroup()).append("_N").append(this.getNumNests()).append(",GetMUI_Text(").append(30 +
+                        Integer.parseInt(this.getUnclamping()[i].substring(m.start() + 1, m.end()))).append("\\\\inTextTable:=nTextTableGraph)\\\\inSV_Value:=2.0;\n");
             }
-            output += "\n";
+            output.append("\n");
         }
-        return output;
+        return output.toString();
     }
 
     public String getPartSensorCheck() {
-	    String output = "";
+	    StringBuilder output = new StringBuilder();
         for(int j = 0; j < this.getNumNests(); j++) {
             for(int k = 0; k < this.getPartSensors().length; k++) {
                 Pattern p = Pattern.compile("\\d+");
@@ -346,24 +341,19 @@ public class Tool {
                     continue;
                 }
                 if(sensor.length()==1) {
-                    output += "			WaitGraphDI di" + indices.get(this.getPosition()) + "B" + sensorMap.get(this
-                            .getPosition()) + sensor + ",log1,log1,log1\\\\inLogOr:=bSQ_Frame" + this.getPosition()
-                            .substring(0,1) + "ClampingNOK_" + this.getFrameGroup() + "_N" + (j + 1) + "," +
-                            "GetMUI_Text(" + (3 + k) + "\\\\inTextTable:=nTextTableGraph)\\\\inSV_Value:=0.5;\n";
+                    output.append("			WaitGraphDI di").append(indices.get(this.getPosition())).append("B").append(sensorMap.get(this
+                            .getPosition())).append(sensor).append(",log1,log1,log1\\\\inLogOr:=bSQ_Frame").append(this.getPosition()
+                            .substring(0, 1)).append("ClampingNOK_").append(this.getFrameGroup()).append("_N").append(j + 1).append(",").append("GetMUI_Text(").append(3 + k).append("\\\\inTextTable:=nTextTableGraph)\\\\inSV_Value:=0.5;\n");
                 } else {
-                    output += "			WaitGraphDI di" + indices.get(this.getPosition()) + "B" + sensor + "," +
-                            "log1," +
-                            "log1,log1\\\\inLogOr:=bSQ_Frame" + this.getPosition().substring(0,1) + "ClampingNOK_" +
-                            this.getFrameGroup() + "_N" + (j + 1) + ",GetMUI_Text(" + (3 + k) +
-                            "\\\\inTextTable:=nTextTableGraph)\\\\inSV_Value:=0.5;\n";
+                    output.append("			WaitGraphDI di").append(indices.get(this.getPosition())).append("B").append(sensor).append(",").append("log1,").append("log1,log1\\\\inLogOr:=bSQ_Frame").append(this.getPosition().substring(0, 1)).append("ClampingNOK_").append(this.getFrameGroup()).append("_N").append(j + 1).append(",GetMUI_Text(").append(3 + k).append("\\\\inTextTable:=nTextTableGraph)\\\\inSV_Value:=0.5;\n");
                 }
             }
         }
-	    return output;
+	    return output.toString();
     }
 
     public String getValveSensorCheck() {
-	    String output = "";
+	    StringBuilder output = new StringBuilder();
         for(int j = 0; j < this.getNumNests(); j++) {
             for(int k = 0; k < this.getSensors().length; k++) {
                 Pattern p = Pattern.compile("\\d+");
@@ -374,23 +364,19 @@ public class Tool {
                     continue;
                 }
                 if(sensor.length()==1) {
-                    output += "			WaitGraphDI di" + indices.get(this.getPosition()) + "B" + sensorMap.get(this
-                            .getPosition()) + sensor + ",log1,log1,log1\\\\inLogOr:=bSQ_Frame" + this.getPosition()
-                            .substring(0,1) + "ClampingNOK_" + this.getFrameGroup() + "_N" + (j + 1) + "," +
-                            "GetMUI_Text(" + (3 + k) + "\\\\inTextTable:=nTextTableGraph)\\\\inSV_Value:=0.5;\n";
+                    output.append("			WaitGraphDI di").append(indices.get(this.getPosition())).append("B").append(sensorMap.get(this
+                            .getPosition())).append(sensor).append(",log1,log1,log1\\\\inLogOr:=bSQ_Frame").append(this.getPosition()
+                            .substring(0, 1)).append("ClampingNOK_").append(this.getFrameGroup()).append("_N").append(j + 1).append(",").append("GetMUI_Text(").append(3 + k).append("\\\\inTextTable:=nTextTableGraph)\\\\inSV_Value:=0.5;\n");
                 } else {
-                    output += "			WaitGraphDI di" + indices.get(this.getPosition()) + "B" + sensor + ",log1," +
-                            "log1,log1\\\\inLogOr:=bSQ_Frame" + this.getPosition().substring(0,1) + "ClampingNOK_" +
-                            this.getFrameGroup() + "_N" + (j + 1) + ",GetMUI_Text(" + (3 + k) +
-                            "\\\\inTextTable:=nTextTableGraph)\\\\inSV_Value:=0.5;\n";
+                    output.append("			WaitGraphDI di").append(indices.get(this.getPosition())).append("B").append(sensor).append(",log1,").append("log1,log1\\\\inLogOr:=bSQ_Frame").append(this.getPosition().substring(0, 1)).append("ClampingNOK_").append(this.getFrameGroup()).append("_N").append(j + 1).append(",GetMUI_Text(").append(3 + k).append("\\\\inTextTable:=nTextTableGraph)\\\\inSV_Value:=0.5;\n");
                 }
             }
         }
-        return output;
+        return output.toString();
     }
 
     public String getPartSensorAndOr(String andor) {
-        String out = "";
+        StringBuilder out = new StringBuilder();
         Pattern p = Pattern.compile("\\d+");
         Matcher m = p.matcher(this.getPartSensors()[0]);
         m.find();
@@ -400,11 +386,11 @@ public class Tool {
             m.find();
             sensor = this.getPartSensors()[k].substring(m.start(),m.end());
             if(sensor.length()==1) {
-                out += "(di" + indices.get(this.getPosition()) + "B" + sensorMap.get(this.getPosition()) + this
-                        .getPartSensors()[k].substring(m.start(),m.end()) + "=high) " + andor + " ";
+                out.append("(di").append(indices.get(this.getPosition())).append("B").append(sensorMap.get(this.getPosition())).append(this
+                        .getPartSensors()[k].substring(m.start(), m.end())).append("=high) ").append(andor).append(" ");
             } else {
-                out += "(di" + indices.get(this.getPosition()) + "B" + this.getPartSensors()[k].substring(m
-                        .start(),m.end()) + "=high) " + andor + " ";
+                out.append("(di").append(indices.get(this.getPosition())).append("B").append(this.getPartSensors()[k].substring(m
+                        .start(), m.end())).append("=high) ").append(andor).append(" ");
             }
         }
         return out.substring(0,out.length() - 4) + ";";

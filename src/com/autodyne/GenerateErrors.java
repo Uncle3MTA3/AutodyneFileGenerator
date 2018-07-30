@@ -8,12 +8,10 @@ public class GenerateErrors {
 	public void createFile(Tool tool, String rootDir) {
 		String moduleName = tool.getModuleName();
 		try{
-			//File dir = new File(rootDir + "\\Error Files\\" + tool.getPosition().substring(0,1) + tool.getFrameGroup() + "\\");
 			File dir = new File(rootDir + "\\Error Files\\");
 			if(! dir.exists()) {
 				dir.mkdirs();
 			}
-			//PrintWriter writer = new PrintWriter(rootDir + "\\Error Files\\" + tool.getPosition().substring(0,1) + tool.getFrameGroup() + "\\" + moduleName + ".txt", "UTF-8");
 			PrintWriter writer = new PrintWriter(rootDir + "\\Error Files\\" + moduleName + ".txt", "UTF-8");
 			writer.println("# " + moduleName + ".txt - BBI text description file");
 			writer.println("#");
